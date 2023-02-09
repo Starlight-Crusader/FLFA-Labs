@@ -1,0 +1,9 @@
+S -> aP
+S -> bQ
+P -> bP
+P -> cP
+P -> dQ
+P -> e
+Q -> eQ
+Q -> fQ
+Q -> a
