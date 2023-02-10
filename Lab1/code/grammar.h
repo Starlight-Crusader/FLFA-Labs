@@ -58,7 +58,7 @@ string Grammar::generateWord() {
     string generatedStr = "S";
     string tmpStr;
 
-    int i, term;
+    int i, term, rn;
 
     while(1) {
         term = 0;
@@ -80,7 +80,7 @@ string Grammar::generateWord() {
                 }    
             }
 
-            for(int j = 0; j < rand() % possibilities.size() + 1; j++) {
+            for(int j = 0; j < rand() % (possibilities.size() + 1); j++) {
                 possibilities.pop_front();
             }
 

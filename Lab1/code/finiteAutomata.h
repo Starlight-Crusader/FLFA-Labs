@@ -1,7 +1,5 @@
 class FiniteAutomata {
     private:
-        list<string> terminalStates;
-
         list<string> transitionMapSource;
         list<string> transitionMapFlag;
         list<string> transitionMapTarget;
@@ -53,23 +51,6 @@ class FiniteAutomata {
                     transitionMapFlag.push_back(parseSpace);
                 }
             }
-
-            for(int i = 0; i < transitionMapSource.size(); i++) {
-                s1 = transitionMapSource.begin();
-                s2 = transitionMapTarget.begin();
-
-                std::advance(s1, i); std::advance(s2, i);
-
-                if(*s2 == "-") {
-                    s3 = find(terminalStates.begin(), terminalStates.end(), *s1);
-
-                    if(s3 == terminalStates.end()) {
-                        terminalStates.push_back(*s1);
-                    } else {
-                        continue;
-                    }
-                }        
-            }
         };
 
         void displayConfiguration();
@@ -89,11 +70,6 @@ void FiniteAutomata::displayConfiguration() {
         cout << "delta(" << *s1 << ", " << *s2 << ") = " << *s3 << '\n';
     }
 
-    cout << '\n' << "TERMINAL STATES: ";
-    for(s1 = terminalStates.begin(); s1 != terminalStates.end(); ++s1) {
-        cout << *s1 << ' ';
-    }
-
     cout << '\n';
 };
 
@@ -101,11 +77,7 @@ int FiniteAutomata::checkWord(string word) {
     string currentState = "S";
     list<string>::iterator s1, s2, s3;
 
-    int tm;
-
     for(int i = 0; i < word.length(); i++) {
-        tm = 0;
-
         for(int j = 0; j < transitionMapSource.size(); j++) {
             s1 = transitionMapSource.begin();
             s2 = transitionMapFlag.begin();
@@ -114,23 +86,14 @@ int FiniteAutomata::checkWord(string word) {
             std::advance(s1, j); std::advance(s2, j); std::advance(s3, j);
         
             if(*s1 == currentState && *s2 == word.substr(i, 1)) {
-                if(*s3 != "-") {
-                    currentState = *s3;
-                }
+                currentState = *s3;
 
-                tm = 1;
                 break;
             }
         }
-
-        if(!tm) {
-            return -1;
-        }
     }
 
-    s1 = find(terminalStates.begin(), terminalStates.end(), currentState);
-
-    if(s1 != terminalStates.end()) {
+    if(currentState == "-") {
         return 1;
     } else {
         return 0;
