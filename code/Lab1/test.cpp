@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #include "grammar.h"
-#include "finiteAutomata.h"
+#include "finiteAutomaton.h"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ int main() {
         cout << *w << '\n';
     }
 
-    FiniteAutomata fa(gramm);
+    FiniteAutomaton fa(gramm);
 
     cout << '\n' << "AUTOMATA CONFIGURATION: " << '\n';
     fa.displayConfiguration();

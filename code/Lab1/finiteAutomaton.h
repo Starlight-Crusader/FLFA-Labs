@@ -1,11 +1,11 @@
-class FiniteAutomata {
+class FiniteAutomaton {
     private:
         list<string> transitionMapSource;
         list<string> transitionMapFlag;
         list<string> transitionMapTarget;
 
     public:
-        FiniteAutomata(Grammar g) {
+        FiniteAutomaton(Grammar g) {
             transitionMapSource.clear();
             transitionMapFlag.clear();
             transitionMapTarget.clear();
@@ -57,7 +57,7 @@ class FiniteAutomata {
         int checkWord(string);
 };
 
-void FiniteAutomata::displayConfiguration() {
+void FiniteAutomaton::displayConfiguration() {
     list<string>::iterator s1, s2, s3;
 
     for(int i = 0; i < transitionMapSource.size(); i++) {
@@ -73,7 +73,7 @@ void FiniteAutomata::displayConfiguration() {
     cout << '\n';
 };
 
-int FiniteAutomata::checkWord(string word) {
+int FiniteAutomaton::checkWord(string word) {
     string currentState = "S";
     list<string>::iterator s1, s2, s3;
 
