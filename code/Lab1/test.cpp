@@ -65,4 +65,4 @@ int main() {
     cout << fa.checkWord("bffffffa") << '\n';
 
     return 0;
-}
+};
