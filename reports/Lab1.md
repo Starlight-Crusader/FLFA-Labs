@@ -162,90 +162,109 @@ This is a very simple **string processing**, since we are dealing with the **Reg
 Next, an automaton was implemented.
 
 ```cpp
-class FiniteAutomata {
-    private:
-        list<string> transitionMapSource;
-        list<string> transitionMapFlag;
-        list<string> transitionMapTarget;
-
+class FiniteAutomaton {
     public:
-        FiniteAutomata(Grammar g) {
-            transitionMapSource.clear();
-            transitionMapFlag.clear();
-            transitionMapTarget.clear();
+        list<string> Vn, Vt;
+        string *transitions;
 
+        FiniteAutomaton(Grammar g) {
+            Vn.clear(); Vt.clear();
+
+            list<string>::iterator s, s1, s2;
             list<Rule>::iterator r;
-            list<string>::iterator s1, s2, s3;
-            string parseSpace;
-            string tempStr;
 
+            for(s = g.Vn.begin(); s != g.Vn.end(); ++s) { Vn.push_back(*s); }
+            for(s = g.Vt.begin(); s != g.Vt.end(); ++s) { Vt.push_back(*s); }
+
+            string parseSpace;
+            list<string> tokens;
+
+            int i, j;
             int check;
-            int c;
+
+            transitions = new string[Vn.size()*Vt.size()];
+
+            for(i = 0; i < Vt.size(); i++) {
+                for(j = 0; j < Vn.size(); j++) {
+                    *(transitions+i*Vn.size()+j) = "";
+                }
+            }
 
             for(r = g.P.begin(); r != g.P.end(); ++r) {
-                parseSpace = r->getLeft() + " -> " + r->getRight();
+                tokens.clear();
+                tokens.push_back(r->getLeft());
 
-                for(int i = 0; i < parseSpace.length(); i++) {
-                    if(parseSpace[i] == '>') {
-                        transitionMapSource.push_back(parseSpace.substr(0, i-2));
-                        parseSpace = parseSpace.substr(i+2, parseSpace.length());
-
-                        break;
-                    } else {
-                        continue;
-                    }
-                }
-
+                parseSpace = r->getRight();
                 check = 0;
 
-                for(int i  = 0; i < parseSpace.length(); i++) {
-                    s1 = find(g.Vn.begin(), g.Vn.end(), parseSpace.substr(i, 1));
+                for(i = 0; i < parseSpace.length(); i++) {
+                    s1 = find(Vn.begin(), Vn.end(), parseSpace.substr(i, 1));
 
-                    if(s1 != g.Vn.end()) {
-                        transitionMapTarget.push_back(parseSpace.substr(i, 1));
-                        transitionMapFlag.push_back(parseSpace.substr(0, i));
+                    if(s1 != Vn.end()) {
+                        if(i == 0) {
+                            tokens.push_back(parseSpace.substr(i+1, parseSpace.length()-1));    
+                        } else {
+                            tokens.push_back(parseSpace.substr(0, i));
+                        }
+
+                        tokens.push_back(parseSpace.substr(i, 1));
 
                         check = 1;
                     }
                 }
 
                 if(!check) {
-                    tempStr = "-";
-                    transitionMapTarget.push_back(tempStr);
-                    transitionMapFlag.push_back(parseSpace);
+                    tokens.push_back(parseSpace);
+                    tokens.push_back("+");
+                }
+
+                s1 = find(Vn.begin(), Vn.end(), tokens.front());
+                tokens.pop_front();
+
+                s2 = find(Vt.begin(), Vt.end(), tokens.front());
+                tokens.pop_front();
+
+                i = distance(Vn.begin(), s1); j = distance(Vt.begin(), s2);
+
+                *(transitions+i*Vt.size()+j) = tokens.front();
+            }
+
+            for(i = 0; i < Vn.size(); i++) {
+                for(j = 0; j < Vt.size(); j++) {
+                    if((transitions+i*Vt.size()+j)->length() == 0) {
+                        *(transitions+i*Vt.size()+j) = '-';
+                    }
                 }
             }
         };
 
         void displayConfiguration();
         int checkWord(string);
+        void deallocateMemory();
 };
 ```
 
-It start from **transcribing the rules in some sort of a map**, that will represent transitions between the states.
+It start from **transcribing the rules in some sort of a graph represented by a 2D array** - transitions between the states.
 
 ```cpp
-int FiniteAutomata::checkWord(string word) {
+int FiniteAutomaton::checkWord(string word) {
     string currentState = "S";
-    list<string>::iterator s1, s2, s3;
+    list<string>::iterator s1, s2;
+    int i, j;
 
-    for(int i = 0; i < word.length(); i++) {
-        for(int j = 0; j < transitionMapSource.size(); j++) {
-            s1 = transitionMapSource.begin();
-            s2 = transitionMapFlag.begin();
-            s3 = transitionMapTarget.begin();
+    for(int k = 0; k < word.length(); k++) {
+        s1 = find(Vn.begin(), Vn.end(), currentState);
+        s2 = find(Vt.begin(), Vt.end(), word.substr(k, 1));
 
-            std::advance(s1, j); std::advance(s2, j); std::advance(s3, j);
-        
-            if(*s1 == currentState && *s2 == word.substr(i, 1)) {
-                currentState = *s3;
-
-                break;
-            }
+        if(s2 != Vt.end()) {
+            i = distance(Vn.begin(), s1); j = distance(Vt.begin(), s2);
+            currentState = *(transitions+i*Vt.size()+j);
+        } else {
+            return 0;
         }
     }
 
-    if(currentState == "-") {
+    if(currentState == "+") {
         return 1;
     } else {
         return 0;
@@ -253,7 +272,7 @@ int FiniteAutomata::checkWord(string word) {
 };
 ```
 
-When checking a word, the automaton iterates through the characters and changes its state according to the map obtained from the rules. If it does end in the final state (indicated as '-' for the program) - the word matches the grammar, does not end - does not matches.
+When checking a word, the automaton iterates through the characters and changes its state according to the map obtained from the rules. If it does end in the final state (indicated as '+' for the program) - the word matches the grammar, does not end - does not matches.
 
 ## Results and conclusions
 
@@ -271,25 +290,22 @@ Q -> fQ
 Q -> a
 
 GENERATED WORDS: 
-acda
-bfa
-bfea
-bea
+bffffa
 ba
+bfefa
+bfeea
+bffffeffa
 
 AUTOMATA CONFIGURATION: 
-delta(S, a) = P
-delta(S, b) = Q
-delta(P, b) = P
-delta(P, c) = P
-delta(P, d) = Q
-delta(P, e) = -
-delta(Q, e) = Q
-delta(Q, f) = Q
-delta(Q, a) = -
+    a b c d e f 
+-----------------
+S | P Q - - - - 
+P | - P P Q + - 
+Q | + - - - Q Q 
 
-
-WORD: bffffffa | ANSWER: 1
+SYNTAX CHECKS: 
+WORD - bffffffa | ANSWER: 1
+WORD - blfffffa | ANSWER: 0
 ```
 
 Regular grammar and final state machines are indeed powerful tools for information conveying and lexical analysis. During this lab, I was able to both gain a stronger grasp on these concepts in particular, and formal languages in general, and develop my technical skills.

@@ -48,8 +48,6 @@ class Grammar {
 };
 
 string Grammar::generateWord() {
-    // unsigned int second = 1000000;
-
     list<Rule> possibilities;
     list<Rule>::iterator r;
 

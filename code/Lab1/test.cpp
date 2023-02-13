@@ -56,13 +56,21 @@ int main() {
         cout << *w << '\n';
     }
 
+    
+
     FiniteAutomaton fa(gramm);
 
     cout << '\n' << "AUTOMATA CONFIGURATION: " << '\n';
     fa.displayConfiguration();
 
-    cout << '\n' << "WORD: bffffffa | ANSWER: ";
+
+    cout << '\n' << "SYNTAX CHECKS: " << '\n';
+    cout << "WORD - bffffffa | ANSWER: ";
     cout << fa.checkWord("bffffffa") << '\n';
 
+    cout << "WORD - blfffffa | ANSWER: ";
+    cout << fa.checkWord("blfffffa") << '\n';
+
+    // fa.deallocateMemory();
     return 0;
 };
