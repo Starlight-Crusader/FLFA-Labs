@@ -27,6 +27,8 @@ class Automaton {
         list<string> Q, E, F;
         list<Transition> G;
 
+        static string NFAorDFA(string);
+
         Automaton() { };
         
         Automaton(string source_name) {
@@ -121,4 +123,66 @@ void Automaton::displayConfig() {
             }
         }
     }
+};
+
+string Automaton::NFAorDFA(string source_name) {list<string> Q, E, F;
+    list<Transition> T;
+
+    ifstream language(source_name);
+    string line;
+
+    getline(language, line);
+    for(int i = 0; i < line.length()-1; i++) {
+        if((line[i] == '{') || (line[i] == ',')) {
+            Q.push_back(Miscellaneous::readNextToken(line.substr(i+1, line.length()-i)));
+        }
+    }
+
+    getline(language, line);
+    for(int i = 0; i < line.length()-1; i++) {
+        if((line[i] == '{') || (line[i] == ',')) {
+            E.push_back(Miscellaneous::readNextToken(line.substr(i+1, line.length()-i)));
+        }
+    }
+
+    getline(language, line);
+    for(int i = 0; i < line.length()-1; i++) {
+        if((line[i] == '{') || (line[i] == ',')) {
+            F.push_back(Miscellaneous::readNextToken(line.substr(i+1, line.length()-i)));
+        }
+    }
+
+    while(!language.eof()) {
+        getline(language, line);
+        T.push_back(Transition(line));
+    }
+
+    int count[Q.size()][E.size()];
+
+    for(int i = 0; i < Q.size(); i++) {
+        for(int j = 0; j < E.size(); j++) {
+            count[i][j] = 0;
+        }
+    }
+
+    list<Transition>::iterator tr;
+    list<string>::iterator qi, ei;
+    string qs, es;
+    int i1, i2;
+    
+    for(tr = T.begin(); tr != T.end(); tr++) {
+        qs = tr->source; es = tr->character;
+        qi = find(Q.begin(), Q.end(), qs); ei = find(E.begin(), E.end(), es);
+        i1 = distance(Q.begin(), qi); i2 = distance(E.begin(), ei);
+
+        count[i1][i2]++;
+
+        if(count[i1][i2] > 1) {
+            line = "NFA";
+            return line;
+        }
+    }
+
+    line = "DFA";
+    return line;
 };
