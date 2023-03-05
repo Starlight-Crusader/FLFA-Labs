@@ -10,11 +10,13 @@
 
 #include "grammar.h"
 #include "finiteAutomaton.h"
+#include "classifier.h"
 
 using namespace std;
 
 
 int main() {
+    /*
     srand(time(0));
     system("clear");
     
@@ -72,5 +74,12 @@ int main() {
     cout << fa.checkWord("blfffffa") << '\n';
 
     // fa.deallocateMemory();
+
+    */
+
+    string source_name = "rules.txt";
+
+    Classifier c;
+    cout << "This is a type " << c.classify(source_name) << " grammar." << '\n';
     return 0;
 };
